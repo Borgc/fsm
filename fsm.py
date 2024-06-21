@@ -123,7 +123,12 @@ class FiniteStateMachine:
                 self.transitions.remove(transition)
                 self.transitions.append((start_state, input_symbol, new_state_index, output_symbol))
                 break
-                
+        
+        for transition in self.transitions:
+            start_state, input_symbol, end_state, output_symbol = transition
+            if start_state == new_state_index:
+                transition = start_state, input_symbol, random.randint(0, self.num_states - 1), output_symbol
+                break
         
 
     def create_graph(self):
@@ -144,7 +149,7 @@ class FiniteStateMachine:
         self.graph = dot
 
 # Usage example
-def test(n, error_type, fsm):
+def test(n, fsm, fsm_mutated):
     """simple test
 
     Args:
@@ -156,12 +161,7 @@ def test(n, error_type, fsm):
         fsm - etalon fsm
     """
 
-
-    fsm_mutated = FiniteStateMachine('G:\\coursework\\FSMs\\0.fsm')
-    fsm_mutated.mutate(error_type)
-
     seq = fsm.gen_random_seq(n)
-    
     out1 = fsm.input_sequence(seq)
     out2 = fsm_mutated.input_sequence(seq)
     if out1 != out2:
@@ -174,26 +174,72 @@ def test(n, error_type, fsm):
     #fsm_mutated.create_graph()
     #fsm_mutated.graph.render('fsm_mutated_diagram', format='png')
     
-def stat_test(k):
+
+def multiple_test(n, num, fsm, fsm_mutated):
+    """test with multiple input sequence for same mutant
+
+    Args:
+        n (_int_): _input length_,
+        error_type (_str_): 
+        _t - transition error, 
+        o - output error, 
+        s - state error_
+        fsm - etalon fsm
+    """
+
+    errors = 0
+    for i in range(num):
+        seq = fsm.gen_random_seq(n)
+        out1 = fsm.input_sequence(seq)
+        out2 = fsm_mutated.input_sequence(seq)
+        
+        if out1 != out2:
+            errors +=1
+    return errors/(num)
+        
+            
+    
+    
+def stat_test(k, error_type):
     """count statistics about multiple simple tests
 
     Args:
         k (_int_): _amount of tests_
+        error_type (_str_): _'t', 'o', 's'_
     """
     #num of FSMs
-    for j in range(1):
-        no_error = 0
+    for j in range(10):
+        num_error = 0
         fsm = FiniteStateMachine(f"G:\\coursework\\FSMs\\{j}.fsm")
+        fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
+        fsm_mutated.mutate(error_type)
         #fsm.create_graph()
         #fsm.graph.render('fsm_diagram', format='png')
         for i in range(k):
-            no_error += test(500, 'o', fsm)
-        print(f"test {j}: {no_error/k} \n") 
-    
+            num_error += test(1000, fsm, fsm_mutated)
+        print(f"test {j}: {num_error/k}") 
 
+def multiple_stat_test( error_type):
+    """count statistics about multiple tests with multiple input sequences for each mutant
+
+    Args:
+        k (_int_): _description_
+        error_type (_str_): _'t', 'o', 's'_
+
+    """
+    for j in range(10):
+        fsm = FiniteStateMachine(f"G:\\coursework\\FSMs\\{j}.fsm")
+        fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
+        fsm_mutated.mutate(error_type)
+        #fsm.create_graph()
+        #fsm.graph.render('fsm_diagram', format='png')
+        
+        print(f"test {j}: {multiple_test(1000, 50, fsm, fsm_mutated)}")
+        
+        
 if __name__ == "__main__":
-    stat_test(50)
-    #fix step func
-    #TODO: fix mutate extra state 
+    stat_test(50, 's')
+    multiple_stat_test('s')
+    #TODO:  
     #сделать отдельный тест для каждого мутанта несколько последовательностей
     #проверить W метод
