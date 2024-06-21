@@ -42,11 +42,11 @@ class FiniteStateMachine:
         for transition in self.transitions:
             start_state, transition_input, end_state, transition_output = transition
             if self.current_state == start_state and input_symbol == transition_input:
-                current_state = end_state
+                self.current_state = end_state
                 output_symbol = transition_output
                 break
 
-        return current_state, output_symbol
+        return self.current_state, output_symbol
     
     def gen_random_seq(self, n):
         """Generates random input string length of n
@@ -144,26 +144,56 @@ class FiniteStateMachine:
         self.graph = dot
 
 # Usage example
-def test():
-    fsm = FiniteStateMachine('etalon.fsm')
+def test(n, error_type, fsm):
+    """simple test
+
+    Args:
+        n (_int_): _input length_,
+        error_type (_str_): 
+        _t - transition error, 
+        o - output error, 
+        s - state error_
+        fsm - etalon fsm
+    """
 
 
-    fsm_mutated = FiniteStateMachine('etalon.fsm')
-    fsm_mutated.mutate('s')
+    fsm_mutated = FiniteStateMachine('G:\\coursework\\FSMs\\0.fsm')
+    fsm_mutated.mutate(error_type)
 
-    n = 1
-    out1 = fsm.input_sequence(fsm.gen_random_seq(n))
-    out2 = fsm_mutated.input_sequence(fsm.gen_random_seq(n))
+    seq = fsm.gen_random_seq(n)
+    
+    out1 = fsm.input_sequence(seq)
+    out2 = fsm_mutated.input_sequence(seq)
     if out1 != out2:
-        print("Error detected")
+        return 1
     else:
-        print("No error")
+        return 0
 
-    fsm.create_graph()
-    fsm.graph.render('fsm_diagram', format='png')
+    
 
-    fsm_mutated.create_graph()
-    fsm_mutated.graph.render('fsm_mutated_diagram', format='png')
+    #fsm_mutated.create_graph()
+    #fsm_mutated.graph.render('fsm_mutated_diagram', format='png')
+    
+def stat_test(k):
+    """count statistics about multiple simple tests
+
+    Args:
+        k (_int_): _amount of tests_
+    """
+    #num of FSMs
+    for j in range(1):
+        no_error = 0
+        fsm = FiniteStateMachine(f"G:\\coursework\\FSMs\\{j}.fsm")
+        #fsm.create_graph()
+        #fsm.graph.render('fsm_diagram', format='png')
+        for i in range(k):
+            no_error += test(500, 'o', fsm)
+        print(f"test {j}: {no_error/k} \n") 
+    
 
 if __name__ == "__main__":
-    test()
+    stat_test(50)
+    #fix step func
+    #TODO: fix mutate extra state 
+    #сделать отдельный тест для каждого мутанта несколько последовательностей
+    #проверить W метод
