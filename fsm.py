@@ -1,5 +1,8 @@
 import graphviz
 import random
+import time
+import matplotlib.pyplot as plt
+
 
 class FiniteStateMachine:
     def __init__(self, description_file):
@@ -193,14 +196,18 @@ def multiple_test(n, num, fsm, fsm_mutated):
         out1 = fsm.input_sequence(seq)
         out2 = fsm_mutated.input_sequence(seq)
         
+        
+        
         if out1 != out2:
+            # print(f"out1 = {out1}")
+            # print(f"out2 = {out2}")
             errors +=1
-    return errors/(num)
+    return errors /num
         
             
     
     
-def stat_test(k, error_type):
+def stat_test(n, error_type):
     """count statistics about multiple simple tests
 
     Args:
@@ -208,18 +215,20 @@ def stat_test(k, error_type):
         error_type (_str_): _'t', 'o', 's'_
     """
     #num of FSMs
-    for j in range(10):
-        num_error = 0
+    res = 0
+    for j in range(100):
+        
         fsm = FiniteStateMachine(f"G:\\coursework\\FSMs\\{j}.fsm")
-        fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
-        fsm_mutated.mutate(error_type)
-        #fsm.create_graph()
-        #fsm.graph.render('fsm_diagram', format='png')
-        for i in range(k):
-            num_error += test(1000, fsm, fsm_mutated)
-        print(f"test {j}: {num_error/k}") 
+        for i in range(100): #num of errors for each automata
+            fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
+            fsm_mutated.mutate(error_type)
+            #fsm.create_graph()
+            #fsm.graph.render('fsm_diagram', format='png')
+            
+            res += test(n, fsm, fsm_mutated)
+    print(f"stat test: {res / (100 * 100)}") 
 
-def multiple_stat_test( error_type):
+def multiple_stat_test(n, num, error_type):
     """count statistics about multiple tests with multiple input sequences for each mutant
 
     Args:
@@ -227,19 +236,138 @@ def multiple_stat_test( error_type):
         error_type (_str_): _'t', 'o', 's'_
 
     """
-    for j in range(10):
+    res = 0
+    for j in range(100): #num of automatas
         fsm = FiniteStateMachine(f"G:\\coursework\\FSMs\\{j}.fsm")
-        fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
-        fsm_mutated.mutate(error_type)
-        #fsm.create_graph()
-        #fsm.graph.render('fsm_diagram', format='png')
-        
-        print(f"test {j}: {multiple_test(1000, 50, fsm, fsm_mutated)}")
-        
+        for i in range(10): #num of errors for each automata
+            fsm_mutated = FiniteStateMachine(f'G:\\coursework\\FSMs\\{j}.fsm')
+            fsm_mutated.mutate(error_type)
+            #fsm.create_graph()
+            #fsm.graph.render('fsm_diagram', format='png')
+            res += multiple_test(n, num, fsm, fsm_mutated)
+    return res / (1000)
+
+def experiment(n, num, error_type):
+    
+    print(f"input sequence len: {n}")
+    print(f"number of input sequences: {num}")
+    print(f"error_type: {error_type}")
+    start_time = time.time()
+    res = multiple_stat_test(n, num, error_type)
+    print(f"errors detected : {res}")
+    end_time = time.time()
+    detected_errors = []
+    detected_errors.append(res)
+    
+    print(f"test time: {end_time - start_time}")
+    return detected_errors
         
 if __name__ == "__main__":
-    stat_test(50, 's')
-    multiple_stat_test('s')
+    # inputs = [[1, 500],
+    #            [2, 250],
+    #            [4, 125],
+    #            [5, 100],
+    #            [10, 50],
+    #            [20, 25],
+    #            [25, 20],
+    #            [50, 10],
+    #            [100, 5],
+    #            [125, 4],
+    #            [250, 2],
+    #            [500, 1]
+    #           ]
+    # for i in range(len(inputs)):
+    #     n = inputs[i][0]
+    #     num = inputs[i][1]
+        
+    #     experiment(n, num, 't')
+    # for i in range(len(inputs)):
+    #     n = inputs[i][0]
+    #     num = inputs[i][1]
+    
+    #     experiment(n, num, 'o')
+    # for i in range(len(inputs)):
+    #     n = inputs[i][0]
+    #     num = inputs[i][1]
+        
+    #     experiment(n, num, 's')
+    
+    
+    inputs = [[1, 1],
+            [2, 1],
+            [4, 1],
+            [5, 1],
+            [10, 1],
+            [20, 1],
+            [25, 1],
+            [50, 1],
+            [100, 1],
+            [125, 1],
+            [250, 1],
+            [500, 1],
+            [625, 1],
+            [750, 1],
+            [875, 1],
+            [1000, 1],
+            [1100, 1],
+            [1200, 1],
+            [1300, 1],
+            [1400, 1],
+            [1500, 1],
+            [1600, 1],
+            [1700, 1],
+            [1800, 1],
+            [1900, 1],
+            [2000, 1],
+            [2100, 1],
+            [2200, 1],
+            [2300, 1],
+            [2400, 1],
+            [2500, 1],
+            [2600, 1],
+            [2700, 1],
+            [2800, 1],
+            [2900, 1],
+            [3000, 1]
+            ]
+    input_sequence_lengths = []
+    for i in range(len(inputs)):
+        input_sequence_lengths.append(inputs[i])
+        
+    for i in range(len(inputs)):
+        n = inputs[i][0]
+        num = inputs[i][1]
+        
+        t_errors_detected = experiment(n, num, 't')
+    for i in range(len(inputs)):
+        n = inputs[i][0]
+        num = inputs[i][1]
+    
+        o_errors_detected = experiment(n, num, 'o')
+    for i in range(len(inputs)):
+        n = inputs[i][0]
+        num = inputs[i][1]
+        s_errors_detected = experiment(n, num, 's')
+    
+    
+
+# Create the figure and axis
+fig, ax = plt.subplots()
+
+# Plot the data
+ax.plot(input_sequence_lengths, t_errors_detected, label='Type t')
+ax.plot(input_sequence_lengths, o_errors_detected, label='Type o')
+ax.plot(input_sequence_lengths, s_errors_detected, label='Type s')
+
+# Set the title and labels
+ax.set_title('Errors Detected vs. Input Sequence Length')
+ax.set_xlabel('Input Sequence Length')
+ax.set_ylabel('Errors Detected')
+
+# Add a legend
+ax.legend()
+plt.savefig("detected_errors_20.png")
+# Show the plot
+plt.show()
     #TODO:  
-    #сделать отдельный тест для каждого мутанта несколько последовательностей
-    #проверить W метод
+    
