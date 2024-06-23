@@ -256,11 +256,8 @@ def experiment(n, num, error_type):
     res = multiple_stat_test(n, num, error_type)
     print(f"errors detected : {res}")
     end_time = time.time()
-    detected_errors = []
-    detected_errors.append(res)
-    
     print(f"test time: {end_time - start_time}")
-    return detected_errors
+    return res
         
 if __name__ == "__main__":
     # inputs = [[1, 500],
@@ -294,43 +291,28 @@ if __name__ == "__main__":
     
     
     inputs = [[1, 1],
-            [2, 1],
-            [4, 1],
-            [5, 1],
-            [10, 1],
-            [20, 1],
-            [25, 1],
-            [50, 1],
-            [100, 1],
-            [125, 1],
-            [250, 1],
-            [500, 1],
-            [625, 1],
-            [750, 1],
-            [875, 1],
-            [1000, 1],
-            [1100, 1],
-            [1200, 1],
-            [1300, 1],
-            [1400, 1],
-            [1500, 1],
-            [1600, 1],
-            [1700, 1],
-            [1800, 1],
-            [1900, 1],
-            [2000, 1],
-            [2100, 1],
-            [2200, 1],
-            [2300, 1],
-            [2400, 1],
-            [2500, 1],
-            [2600, 1],
-            [2700, 1],
-            [2800, 1],
-            [2900, 1],
-            [3000, 1]
+             [1, 1],
+             [2, 1],
+             [4, 1],
+             [5, 1],
+             [10, 1],
+             [20, 1],
+             [25, 1],
+             [50, 1],
+             [100, 1],
+             [125, 1],
+             [250, 1],
+             [500, 1],
+             [625, 1],
+             [750, 1],
+             [875, 1],
+             [1000, 1]
+            
             ]
     input_sequence_lengths = []
+    t_errors_detected = []
+    o_errors_detected = []
+    s_errors_detected = []
     for i in range(len(inputs)):
         input_sequence_lengths.append(inputs[i])
         
@@ -338,17 +320,19 @@ if __name__ == "__main__":
         n = inputs[i][0]
         num = inputs[i][1]
         
-        t_errors_detected = experiment(n, num, 't')
+        t_errors_detected.append(experiment(n, num, 't'))
     for i in range(len(inputs)):
         n = inputs[i][0]
         num = inputs[i][1]
     
-        o_errors_detected = experiment(n, num, 'o')
+        o_errors_detected.append(experiment(n, num, 'o'))
     for i in range(len(inputs)):
         n = inputs[i][0]
         num = inputs[i][1]
-        s_errors_detected = experiment(n, num, 's')
-    
+        s_errors_detected.append(experiment(n, num, 's'))
+    print(len(inputs), len(t_errors_detected), len(o_errors_detected), len(s_errors_detected))
+    print(input_sequence_lengths, t_errors_detected, o_errors_detected, s_errors_detected)
+
     
 
 # Create the figure and axis
